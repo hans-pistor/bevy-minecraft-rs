@@ -1,8 +1,8 @@
 use bevy::prelude::Plugin;
 use registry::RegistryPlugin;
 
-mod registry;
-mod voxel;
+pub mod registry;
+pub mod voxel;
 
 pub struct BevyMinecraftPlugin;
 

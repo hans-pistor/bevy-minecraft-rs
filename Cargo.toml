@@ -3,7 +3,13 @@ name = "bevy-minecraft-rs"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "bevy_minecraft_rs_lib"
+path = "src/lib.rs"
+
+[[bin]]
+name = "bevy-minecraft-rs"
+path = "src/main.rs"
 
 [dependencies]
 bevy = "0.10"

@@ -8,9 +8,14 @@ use bevy::{
 
 use crate::voxel::BlockMaterialId;
 
-struct BlockRegistryInfo {
+pub type BlockRegistry = Registry<BlockMaterialId, BlockRegistryInfo>;
+
+pub struct BlockRegistryInfo {
     pub name: &'static str,
     pub texture_handle: Handle<Image>,
+
+    // TODO: remove once we load textures properly
+    pub color: Color,
 }
 
 impl Debug for BlockRegistryInfo {
@@ -44,7 +49,7 @@ impl<K: Eq + PartialEq + Hash + Debug + Copy, V: Debug> Registry<K, V> {
     pub fn get(&self, id: K) -> &V {
         match self.backing_map.get(&id) {
             Some(info) => info,
-            None => panic!("[{}] No value found at key {id:?}", self.name)
+            None => panic!("[{}] No value found at key {id:?}", self.name),
         }
     }
 }
@@ -53,9 +58,21 @@ pub struct RegistryPlugin;
 
 impl Plugin for RegistryPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(Registry {
+        // TODO: handle events instead of hard coding the setup
+        let mut block_registry: BlockRegistry = Registry {
             name: "Block Registry",
             backing_map: HashMap::<BlockMaterialId, BlockRegistryInfo>::new(),
-        });
+        };
+
+        block_registry.register(
+            1,
+            BlockRegistryInfo {
+                name: "black",
+                color: Color::BLACK,
+                texture_handle: Default::default(),
+            },
+        );
+
+        app.insert_resource(block_registry);
     }
 }
