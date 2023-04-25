@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{registry::BlockRegistry, voxel::Voxel, GameState};
+use crate::{registry::block::BlockRegistry, voxel::Voxel, GameState};
 
 fn test_render_startup_system(
     mut commands: Commands,

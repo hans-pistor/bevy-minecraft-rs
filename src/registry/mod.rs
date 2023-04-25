@@ -6,33 +6,21 @@ use bevy::{
     utils::{Entry, HashMap},
 };
 
-use crate::voxel::BlockMaterialId;
+use self::{block::BlockRegistryPlugin, asset_tracker::TrackedAssetPlugin};
 
-pub type BlockRegistry = Registry<BlockMaterialId, BlockRegistryInfo>;
+pub mod asset_tracker;
+pub mod block;
 
-pub struct BlockRegistryInfo {
-    pub name: &'static str,
-    pub texture_handle: Handle<Image>,
-
-    // TODO: remove once we load textures properly
-    pub color: Color,
-}
-
-impl Debug for BlockRegistryInfo {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("BlockRegistryInfo")
-            .field("name", &self.name)
-            .finish()
-    }
-}
+pub trait RegistryKey: Eq + PartialEq + Hash + Debug + Copy {}
+pub trait RegistryValue: Debug + Clone {}
 
 #[derive(Resource)]
-pub struct Registry<K: Eq + PartialEq + Hash + Debug + Copy, V: Debug> {
+pub struct Registry<K: RegistryKey, V: RegistryValue> {
     name: &'static str,
     backing_map: HashMap<K, V>,
 }
 
-impl<K: Eq + PartialEq + Hash + Debug + Copy, V: Debug> Registry<K, V> {
+impl<K: RegistryKey, V: RegistryValue> Registry<K, V> {
     pub fn register(&mut self, id: K, val: V) {
         match self.backing_map.entry(id) {
             Entry::Occupied(occupied) => panic!(
@@ -54,25 +42,31 @@ impl<K: Eq + PartialEq + Hash + Debug + Copy, V: Debug> Registry<K, V> {
     }
 }
 
+pub struct RegisterEvent<K: RegistryKey, V: RegistryValue> {
+    pub key: K,
+    pub val: V,
+}
+
+fn handle_register_events<
+    K: RegistryKey + Send + Sync + 'static,
+    V: RegistryValue + Send + Sync + 'static,
+>(
+    mut registry: ResMut<Registry<K, V>>,
+    mut reader: EventReader<RegisterEvent<K, V>>,
+) {
+    for event in reader.iter() {
+        let RegisterEvent { key, val } = event;
+        info!("Handling register for {:?}", val);
+        registry.register(key.clone(), val.clone());
+    }
+}
+
 pub struct RegistryPlugin;
 
 impl Plugin for RegistryPlugin {
     fn build(&self, app: &mut App) {
-        // TODO: handle events instead of hard coding the setup
-        let mut block_registry: BlockRegistry = Registry {
-            name: "Block Registry",
-            backing_map: HashMap::<BlockMaterialId, BlockRegistryInfo>::new(),
-        };
-
-        block_registry.register(
-            1,
-            BlockRegistryInfo {
-                name: "black",
-                color: Color::BLACK,
-                texture_handle: Default::default(),
-            },
-        );
-
-        app.insert_resource(block_registry);
+        app
+            .add_plugin(TrackedAssetPlugin)
+            .add_plugin(BlockRegistryPlugin);
     }
 }
