@@ -21,7 +21,7 @@ fn test_render_startup_system(
     // cube
     commands.spawn(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-        material: materials.add(block_registry.get(voxel.block_id).color.into()),
+        material: materials.get_handle(&block_registry.get(voxel.block_id).material_handle),
         transform: Transform::from_xyz(0.0, 0.5, 0.0),
         ..default()
     });

@@ -8,10 +8,7 @@ pub type BlockRegistry = Registry<BlockMaterialId, BlockRegistryInfo>;
 #[derive(Clone)]
 pub struct BlockRegistryInfo {
     pub name: &'static str,
-    pub texture_handle: Handle<Image>,
-
-    // TODO: remove once we load textures properly
-    pub color: Color,
+    pub material_handle: Handle<StandardMaterial>,
 }
 
 impl std::fmt::Debug for BlockRegistryInfo {
@@ -25,18 +22,22 @@ impl std::fmt::Debug for BlockRegistryInfo {
 impl RegistryKey for BlockMaterialId {}
 impl RegistryValue for BlockRegistryInfo {}
 
-fn register_blocks(asset_server: Res<AssetServer>, mut writer: EventWriter<RegisterEvent<BlockMaterialId, BlockRegistryInfo>>, mut tracker: ResMut<TrackedAssets>) {
+fn register_blocks(asset_server: Res<AssetServer>, mut writer: EventWriter<RegisterEvent<BlockMaterialId, BlockRegistryInfo>>, mut tracker: ResMut<TrackedAssets>, mut materials: ResMut<Assets<StandardMaterial>>) {
     info!("Registering blocks");
     let texture_handle: Handle<Image> = asset_server.load("textures/block/stone.png");
 
     tracker.track(texture_handle.clone_untyped());
 
+    let material_handle = materials.add(StandardMaterial {
+        base_color_texture: Some(texture_handle),
+        ..Default::default()
+    });
+
     writer.send(RegisterEvent {
         key: 1,
         val: BlockRegistryInfo {
             name: "black",
-            texture_handle,
-            color: Color::BLACK,
+            material_handle
         },
     });
 }
