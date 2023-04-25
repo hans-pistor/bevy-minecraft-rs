@@ -18,6 +18,11 @@ jobs:
   release-wasm:
     runs-on: ubuntu-latest
 
+    permissions:
+      id-token: write
+      pages: write
+      contents: write
+
     steps:
       - uses: olegtarasov/get-tag@v2.1.2
         id: get_version
@@ -68,6 +73,9 @@ jobs:
         with:
           path: wasm/
           retention-days: 1
+
+      - name: Deploy to gh-pages
+        uses: actions/deploy-pages@v2
 
 
 
