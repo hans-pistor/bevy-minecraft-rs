@@ -35,8 +35,9 @@ jobs:
 
       - name: Prepare package
         run: |
-          wasm-bindgen --no-typescript --out-name bevy_game --out-dir wasm --target web target/wasm32-unknown-unknown/release/${{ env.binary }}.wasm
+          wasm-bindgen --no-typescript --out-name bevy-minecraft-rs-wasm --out-dir wasm --target web target/wasm32-unknown-unknown/release/${{ env.binary }}.wasm
           cp -r assets wasm/
+          cp index.html wasm/
 
       - name: Package as a zip
         working-directory: ./wasm
@@ -58,6 +59,17 @@ jobs:
           asset_name: ${{ env.binary }}-wasm-${{ steps.get_version.outputs.tag }}.zip
           tag: ${{ github.ref }}
           overwrite: true
+
+      - name: Setup gh-pages
+        uses: actions/configure-pages@v3
+
+      - name: Upload assets to gh-pages
+        uses: actions/upload-pages-artifact@v1.0.8
+        with:
+          path: wasm/
+          retention-days: 1
+
+
 
   # Build for Linux
   release-linux:
