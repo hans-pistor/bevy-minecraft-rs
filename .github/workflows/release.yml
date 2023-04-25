@@ -61,10 +61,10 @@ jobs:
           overwrite: true
 
       - name: Setup gh-pages
-        uses: actions/configure-pages@v2
+        uses: actions/configure-pages@v3
 
       - name: Upload assets to gh-pages
-        uses: actions/upload-pages-artifact@v1.0.4
+        uses: actions/upload-pages-artifact@v1.0.8
         with:
           path: wasm/
           retention-days: 1
