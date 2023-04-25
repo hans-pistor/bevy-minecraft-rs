@@ -6,7 +6,7 @@ use bevy::{
     utils::{Entry, HashMap},
 };
 
-use self::{block::BlockRegistryPlugin, asset_tracker::TrackedAssetPlugin};
+use self::{asset_tracker::TrackedAssetPlugin, block::BlockRegistryPlugin};
 
 pub mod asset_tracker;
 pub mod block;
@@ -57,7 +57,7 @@ fn handle_register_events<
     for event in reader.iter() {
         let RegisterEvent { key, val } = event;
         info!("Handling register for {:?}", val);
-        registry.register(key.clone(), val.clone());
+        registry.register(*key, val.clone());
     }
 }
 
@@ -65,8 +65,7 @@ pub struct RegistryPlugin;
 
 impl Plugin for RegistryPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_plugin(TrackedAssetPlugin)
+        app.add_plugin(TrackedAssetPlugin)
             .add_plugin(BlockRegistryPlugin);
     }
 }

@@ -1,7 +1,10 @@
 use crate::{voxel::BlockMaterialId, GameState};
 use bevy::{prelude::*, utils::HashMap};
 
-use super::{RegisterEvent, Registry, RegistryKey, RegistryValue, handle_register_events, asset_tracker::TrackedAssets};
+use super::{
+    asset_tracker::AssetTracker, handle_register_events, RegisterEvent, Registry, RegistryKey,
+    RegistryValue,
+};
 
 pub type BlockRegistry = Registry<BlockMaterialId, BlockRegistryInfo>;
 
@@ -22,7 +25,12 @@ impl std::fmt::Debug for BlockRegistryInfo {
 impl RegistryKey for BlockMaterialId {}
 impl RegistryValue for BlockRegistryInfo {}
 
-fn register_blocks(asset_server: Res<AssetServer>, mut writer: EventWriter<RegisterEvent<BlockMaterialId, BlockRegistryInfo>>, mut tracker: ResMut<TrackedAssets>, mut materials: ResMut<Assets<StandardMaterial>>) {
+fn register_blocks(
+    asset_server: Res<AssetServer>,
+    mut writer: EventWriter<RegisterEvent<BlockMaterialId, BlockRegistryInfo>>,
+    mut tracker: ResMut<AssetTracker>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
     info!("Registering blocks");
     let texture_handle: Handle<Image> = asset_server.load("textures/block/stone.png");
 
@@ -37,7 +45,7 @@ fn register_blocks(asset_server: Res<AssetServer>, mut writer: EventWriter<Regis
         key: 1,
         val: BlockRegistryInfo {
             name: "black",
-            material_handle
+            material_handle,
         },
     });
 }
@@ -53,7 +61,6 @@ impl Plugin for BlockRegistryPlugin {
             })
             // Write events
             .add_system(register_blocks.in_schedule(OnEnter(GameState::Loading)))
-
             // Read events
             .add_system(handle_register_events::<BlockMaterialId, BlockRegistryInfo>);
     }

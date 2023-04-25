@@ -42,7 +42,6 @@ fn test_render_startup_system(
     });
 }
 
-
 pub struct RenderPlugin;
 
 impl Plugin for RenderPlugin {
