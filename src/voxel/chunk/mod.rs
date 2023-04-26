@@ -1,6 +1,6 @@
 use bevy::prelude::UVec3;
 use ilattice::prelude::Extent;
-use ndshape::{Shape, ConstShape3u32};
+use ndshape::{ConstShape3u32, Shape};
 
 use super::Voxel;
 
@@ -13,9 +13,8 @@ pub type ChunkShape = ConstShape3u32<CHUNK_LENGTH, CHUNK_HEIGHT, CHUNK_LENGTH>;
 #[derive(Clone)]
 pub struct ChunkBuffer {
     data: Box<[Voxel]>,
-    shape: ChunkShape
+    shape: ChunkShape,
 }
-
 
 impl ChunkBuffer {
     pub fn new(initial: Voxel) -> ChunkBuffer {
@@ -23,7 +22,7 @@ impl ChunkBuffer {
 
         Self {
             data: vec![initial; shape.size() as usize].into_boxed_slice(),
-            shape
+            shape,
         }
     }
 
@@ -40,7 +39,13 @@ impl ChunkBuffer {
     }
 
     pub fn fill_extent(&mut self, extent: Extent<UVec3>, val: Voxel) {
-        ndcopy::fill3(extent.shape.to_array(), val, &mut self.data, &self.shape, extent.minimum.to_array());
+        ndcopy::fill3(
+            extent.shape.to_array(),
+            val,
+            &mut self.data,
+            &self.shape,
+            extent.minimum.to_array(),
+        );
     }
 
     pub fn shape(&self) -> &ChunkShape {

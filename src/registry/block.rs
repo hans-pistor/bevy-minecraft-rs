@@ -65,7 +65,6 @@ fn register_blocks(
             material_handle,
         },
     });
-
 }
 
 pub struct BlockRegistryPlugin;

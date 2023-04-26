@@ -1,4 +1,3 @@
-
 pub mod chunk;
 
 /// Using a type alias for the backing representation of the block material id so that
