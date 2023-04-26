@@ -1,3 +1,5 @@
+pub mod chunk;
+
 /// Using a type alias for the backing representation of the block material id so that
 /// it's easier to migrate once we need more than 255 block types.
 pub type BlockMaterialId = u8;

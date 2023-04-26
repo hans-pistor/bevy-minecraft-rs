@@ -44,7 +44,24 @@ fn register_blocks(
     writer.send(RegisterEvent {
         key: 1,
         val: BlockRegistryInfo {
-            name: "black",
+            name: "stone",
+            material_handle,
+        },
+    });
+
+    let texture_handle: Handle<Image> = asset_server.load("textures/block/dirt.png");
+
+    tracker.track(texture_handle.clone_untyped());
+
+    let material_handle = materials.add(StandardMaterial {
+        base_color_texture: Some(texture_handle),
+        ..Default::default()
+    });
+
+    writer.send(RegisterEvent {
+        key: 2,
+        val: BlockRegistryInfo {
+            name: "dirt",
             material_handle,
         },
     });
