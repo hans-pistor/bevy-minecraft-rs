@@ -136,9 +136,7 @@ fn player_plugin_startup(mut commands: Commands) {
         .insert(PlayerController::default());
 }
 
-fn player_mouse_setup(
-    mut primary_window: Query<&mut Window, With<PrimaryWindow>>,
-) {
+fn player_mouse_setup(mut primary_window: Query<&mut Window, With<PrimaryWindow>>) {
     let mut window = primary_window.single_mut();
     window.cursor.grab_mode = CursorGrabMode::Confined;
     window.cursor.visible = false;
@@ -148,7 +146,11 @@ pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_system(player_plugin_startup.in_schedule(OnEnter(GameState::Running)))
-            .add_system(player_mouse_setup.in_schedule(OnEnter(GameState::Running)).after(player_plugin_startup))
+            .add_system(
+                player_mouse_setup
+                    .in_schedule(OnEnter(GameState::Running))
+                    .after(player_plugin_startup),
+            )
             .add_system(handle_player_keyboard.in_set(OnUpdate(GameState::Running)))
             .add_system(handle_player_mouse.in_set(OnUpdate(GameState::Running)))
             .add_system(handle_mouse_grab_mode.in_set(OnUpdate(GameState::Running)));
