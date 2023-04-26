@@ -19,7 +19,6 @@ pub struct PlayerController {
     velocity: Vec3,
 }
 
-/// TODO: find a way to default to Locked mode
 fn handle_mouse_grab_mode(
     input: Res<Input<KeyCode>>,
     // The primary window is a marker component for determining which window is currently active
@@ -30,7 +29,7 @@ fn handle_mouse_grab_mode(
     if input.just_pressed(KeyCode::Escape) {
         let updated_grab_mode = match window.cursor.grab_mode {
             CursorGrabMode::Locked | CursorGrabMode::Confined => CursorGrabMode::None,
-            CursorGrabMode::None => CursorGrabMode::Locked,
+            CursorGrabMode::None => CursorGrabMode::Confined,
         };
 
         // Locked not available on windows, Confined not available on osx, treat them as the same
@@ -137,10 +136,19 @@ fn player_plugin_startup(mut commands: Commands) {
         .insert(PlayerController::default());
 }
 
+fn player_mouse_setup(
+    mut primary_window: Query<&mut Window, With<PrimaryWindow>>,
+) {
+    let mut window = primary_window.single_mut();
+    window.cursor.grab_mode = CursorGrabMode::Confined;
+    window.cursor.visible = false;
+}
+
 pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_system(player_plugin_startup.in_schedule(OnEnter(GameState::Running)))
+            .add_system(player_mouse_setup.in_schedule(OnEnter(GameState::Running)).after(player_plugin_startup))
             .add_system(handle_player_keyboard.in_set(OnUpdate(GameState::Running)))
             .add_system(handle_player_mouse.in_set(OnUpdate(GameState::Running)))
             .add_system(handle_mouse_grab_mode.in_set(OnUpdate(GameState::Running)));
