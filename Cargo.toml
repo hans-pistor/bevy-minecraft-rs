@@ -13,3 +13,6 @@ path = "src/main.rs"
 
 [dependencies]
 bevy = "0.10"
+ndshape = "0.3"
+ndcopy = "0.3"
+ilattice = "0.3"
