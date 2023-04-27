@@ -1,7 +1,9 @@
 use crate::registry::RegistryPlugin;
 use crate::render::RenderPlugin;
 use bevy::prelude::*;
+use player::PlayerPlugin;
 
+pub mod player;
 pub mod registry;
 pub mod render;
 pub mod voxel;
@@ -19,6 +21,7 @@ impl Plugin for BevyMinecraftPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
         app.add_state::<GameState>()
             .add_plugin(RegistryPlugin)
+            .add_plugin(PlayerPlugin)
             .add_plugin(RenderPlugin);
     }
 }
